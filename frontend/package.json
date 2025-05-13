@@ -1,0 +1,36 @@
+{
+  "name": "scoremaker",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "next dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hijin-dong/Tube2Pdf.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hijin-dong/Tube2Pdf/issues"
+  },
+  "homepage": "https://github.com/hijin-dong/Tube2Pdf#readme",
+  "description": "",
+  "dependencies": {
+    "axios": "^1.9.0",
+    "next": "^15.3.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-easy-crop": "^5.4.1"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.9.36",
+    "@types/node": "22.15.17",
+    "@types/react": "^19.1.4",
+    "@types/react-dom": "^19.1.4",
+    "@types/react-easy-crop": "^1.16.0",
+    "typescript": "^5.8.3"
+  }
+}
