@@ -1,5 +1,18 @@
-from img2pdf import convert as img2pdf_convert
+from PIL import Image
+from fpdf import FPDF
 
-def create_pdf_from_images(image_paths: list, output_pdf_path: str):
-    with open(output_pdf_path, "wb") as f:
-        f.write(img2pdf_convert(image_paths))
+def create_pdf_from_images(images: list, output_pdf_path: str, per_page=1):
+    pdf = FPDF(orientation='P', unit='mm', format='A4')
+    width, height = 210, 297
+
+    for i in range(0, len(images), per_page):
+        imgs = images[i:i+per_page]
+        pdf.add_page()
+        split_height = height / per_page
+        for idx, img_path in enumerate(imgs):
+            img = Image.open(img_path)
+            tmp_path = img_path.replace(".jpg", f"_{idx}.jpg")
+            img.save(tmp_path, "JPEG")
+            pdf.image(tmp_path, x=10, y=split_height * idx + 10, w=width - 20, h=split_height - 20)
+
+    pdf.output(output_pdf_path)
