@@ -1,54 +1,78 @@
-import React, { useState, useCallback } from 'react';
-import Cropper from 'react-easy-crop';
-import { Area } from 'react-easy-crop/types';
-import { getCroppedImg } from '@/utils/cropImage'; // 유틸로 따로 뺌
+import React, { useState, useRef } from "react";
+import ReactCrop, { Crop, PixelCrop } from "react-image-crop";
+import "react-image-crop/dist/ReactCrop.css";
 
 interface VideoCropperProps {
   image: string;
-  onCrop: (blob: Blob, cropBox: { x: number; y: number; w: number; h: number }) => void;
+  onCropDone: (blob: Blob, box: { x: number; y: number; w: number; h: number }) => void;
 }
 
+const VideoCropper: React.FC<VideoCropperProps> = ({ image, onCropDone }) => {
+  const [crop, setCrop] = useState<Crop>({
+    unit: '%',
+    width: 30,
+    height: 30,
+    x: 0,
+    y: 0,
+  });
 
-const VideoCropper: React.FC<VideoCropperProps> = ({ image, onCrop }) => {
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+  const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
+  const imgRef = useRef<HTMLImageElement>(null);
 
-  const onCropComplete = useCallback((_: Area, croppedArea: Area) => {
-    setCroppedAreaPixels(croppedArea);
-  }, []);
+  const handleCropComplete = async () => {
+    if (!completedCrop || !imgRef.current) return;
 
-const handleCrop = async () => {
-  const pixelCrop = {
-    x: crop.x,
-    y: crop.y,
-    width: croppedAreaPixels?.width || 0,
-    height: croppedAreaPixels?.height || 0,
+    const canvas = document.createElement('canvas');
+    canvas.width = completedCrop.width;
+    canvas.height = completedCrop.height;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.drawImage(
+      imgRef.current,
+      completedCrop.x,
+      completedCrop.y,
+      completedCrop.width,
+      completedCrop.height,
+      0,
+      0,
+      completedCrop.width,
+      completedCrop.height
+    );
+
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+
+      onCropDone(blob, {
+        x: completedCrop.x,
+        y: completedCrop.y,
+        w: completedCrop.width,
+        h: completedCrop.height,
+      });
+    }, 'image/jpeg');
   };
 
-  const blob = await getCroppedImg(image, pixelCrop);
-  onCrop(blob, {
-    x: pixelCrop.x,
-    y: pixelCrop.y,
-    w: pixelCrop.width,
-    h: pixelCrop.height,
-  });
-};
-
   return (
-    <div className="relative w-full h-[60vh]">
-      <Cropper
-        image={image}
+    <div className="relative p-4">
+      <ReactCrop
         crop={crop}
-        zoom={zoom}
-        aspect={4 / 3} // 원하는 비율로 바꿔도 돼
-        onCropChange={setCrop}
-        onZoomChange={setZoom}
-        onCropComplete={onCropComplete}
-      />
+        onChange={(newCrop) => setCrop(newCrop)}
+        onComplete={(c) => setCompletedCrop(c)}
+        ruleOfThirds
+        keepSelection={false}
+      >
+        <img
+          ref={imgRef}
+          src={image}
+          alt="to crop"
+          style={{ maxHeight: "60vh" }}
+        />
+      </ReactCrop>
+
       <button
-        onClick={handleCrop}
-        className="absolute bottom-4 right-4 bg-blue-500 text-white px-4 py-2 rounded"
+        className="absolute bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded shadow-lg z-50"
+        onClick={handleCropComplete}
       >
         크롭 완료
       </button>
