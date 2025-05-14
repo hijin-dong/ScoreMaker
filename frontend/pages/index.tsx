@@ -15,7 +15,7 @@ export default function Home() {
     setYoutubeUrl(url);
     setStartTime(time);
 
-    const res = await fetch('/api/get-frame', {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/get-frame`, {
       method: 'POST',
       body: JSON.stringify({ url, startTime: time }),
       headers: { 'Content-Type': 'application/json' },
@@ -34,7 +34,7 @@ export default function Home() {
     <div className="p-8">
       {!frameUrl && <YouTubeInput onSubmit={handleSubmit} />}
       {frameUrl && !croppedImage && (
-        <VideoCropper image={frameUrl} onCrop={handleCrop} />
+        <VideoCropper image={frameUrl} onCropDone={handleCrop} />
       )}
       {croppedImage && cropBox && (
         <PdfDownloadButton
