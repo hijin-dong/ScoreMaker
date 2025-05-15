@@ -1,10 +1,14 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from backend.utils.youtube_download import download_youtube_video
 from backend.utils.frame_extractor import extract_and_crop_frames
+from backend.utils.process_video import process_youtube_video_to_pdf
 import tempfile
 import base64
 import cv2
+import json
+import os
 
 app = FastAPI()
 
@@ -47,3 +51,30 @@ async def get_frame(request: Request):
             frame_url = f"data:image/jpeg;base64,{base64_str}"
 
         return {"frameUrl": frame_url}
+
+@app.post("/api/generate-pdf")
+async def generate_pdf(request: Request):
+    form = await request.form()
+
+    # 폼데이터에서 항목 추출
+    url = form["url"]
+    start_time = int(form["startTime"])
+    crop_box = json.loads(form["cropBox"])  # [x, y, w, h]
+    
+    # 이미지 파일은 "image" 키로 전달됨
+    image = form["image"]  # 현재는 업로드만 받고 사용 안 함
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        output_pdf_path = os.path.join(tmpdir, "output.pdf")
+        try:
+            process_youtube_video_to_pdf(
+                youtube_url=url,
+                crop_box=crop_box,
+                output_pdf_path=output_pdf_path,
+                start_time_sec=start_time,
+            )
+        except Exception as e:
+            print("PDF 생성 실패:", e)
+            return {"error": "PDF 생성 중 오류 발생!"}
+
+        return FileResponse(output_pdf_path, media_type="application/pdf", filename="sheet.pdf")

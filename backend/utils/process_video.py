@@ -1,7 +1,7 @@
 import tempfile
-from utils.youtube_download import download_youtube_video
-from utils.frame_extractor import extract_and_crop_frames
-from utils.pdf_maker import create_pdf_from_images
+from backend.utils.youtube_download import download_youtube_video
+from backend.utils.frame_extractor import extract_and_crop_frames
+from backend.utils.pdf_maker import create_pdf_from_images
 
 def process_youtube_video_to_pdf(
     youtube_url: str,
