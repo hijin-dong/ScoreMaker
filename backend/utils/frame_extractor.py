@@ -19,7 +19,7 @@ def extract_and_crop_frames(
     fps = cap.get(cv2.CAP_PROP_FPS)
     cap.set(cv2.CAP_PROP_POS_FRAMES, start_time_sec * fps)
 
-    frame_interval = int(fps)  # 매 1초마다 프레임 추출
+    frame_interval = int(fps)
     count = 0
     saved_images = []
     last_saved = None
@@ -30,7 +30,15 @@ def extract_and_crop_frames(
             break
 
         if count % frame_interval == 0:
+            height, width, _ = frame.shape
             x, y, w, h = crop_box
+
+            # Crop box 보정
+            x = max(0, x)
+            y = max(0, y)
+            w = min(w, width - x)
+            h = min(h, height - y)
+
             cropped = frame[y:y+h, x:x+w]
 
             if last_saved is not None and is_similar(last_saved, cropped):
@@ -46,3 +54,4 @@ def extract_and_crop_frames(
 
     cap.release()
     return saved_images
+

@@ -1,16 +1,22 @@
 import React, { useState } from 'react';
 
 interface YouTubeInputProps {
-  onSubmit: (url: string, startTime: number) => void;
+  onSubmit: (url: string, startTime: number) => Promise<void>; // 비동기 호출로 변경
 }
 
 const YouTubeInput: React.FC<YouTubeInputProps> = ({ onSubmit }) => {
   const [url, setUrl] = useState('');
   const [startTime, setStartTime] = useState(0);
+  const [isLoading, setIsLoading] = useState(false); // 로딩 상태 추가
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(url, startTime);
+    setIsLoading(true);
+    try {
+      await onSubmit(url, startTime);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -34,8 +40,14 @@ const YouTubeInput: React.FC<YouTubeInputProps> = ({ onSubmit }) => {
         min={0}
       />
 
-      <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded mt-2">
-        첫 프레임 불러오기
+      <button
+        type="submit"
+        disabled={isLoading}
+        className={`px-4 py-2 rounded text-white transition-colors ${
+          isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+        }`}
+      >
+        {isLoading ? '불러오는 중...' : '첫 프레임 불러오기'}
       </button>
     </form>
   );
