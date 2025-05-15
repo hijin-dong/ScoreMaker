@@ -23,18 +23,23 @@ async def get_frame(request: Request):
     start_time = data.get("startTime", 0)
     print(f"받은 유튜브 링크: {url}, 시작 시간: {start_time}")
 
-    # 1. 임시 폴더에 유튜브 영상 다운로드
+    # 임시 폴더에 유튜브 영상 다운로드
     with tempfile.TemporaryDirectory() as tmpdir:
         video_path = download_youtube_video(url, tmpdir)
 
-        # 2. 첫 프레임 추출 (임시로 전체화면 크롭)
-        crop_box = (0, 0, 1280, 720)  # → 임의로 전체화면으로 잡음
+        cap = cv2.VideoCapture(video_path)
+        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        cap.release()
+
+        crop_box = (0, 0, width, height)
+
         frame_paths = extract_and_crop_frames(video_path, crop_box, start_time_sec=start_time)
 
         if not frame_paths:
             return {"error": "프레임 추출 실패!"}
 
-        # 3. 첫 프레임을 base64로 변환
+        # 첫 프레임을 base64로 변환
         frame_path = frame_paths[0]
         with open(frame_path, "rb") as f:
             img_bytes = f.read()
