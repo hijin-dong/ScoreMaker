@@ -4,7 +4,7 @@ import tempfile
 import numpy as np
 from typing import Tuple, List
 
-def is_similar(img1, img2, threshold=30):
+def is_similar(img1, img2, threshold=10):
     """Returns True if two images are visually similar based on pixel-wise difference."""
     diff = cv2.absdiff(img1, img2)
     mean_diff = np.mean(diff)
