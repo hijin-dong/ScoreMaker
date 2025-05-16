@@ -1,33 +1,15 @@
 ## 🎼 영상 채보 유틸 (ver.1)
-### 🧰 스택 (업데이트 예정)
-- React (Next.js)
-- TypeScript
-- react-image-crop
-- FastAPI
-- Python 3.11
-- ffmpeg
-- Pillow
+### 사용방법
+- Youtube 링크와 시작 시간 입력
+- 악보 부분 크롭 및 완료 버튼 클릭
 
-### 📂 현재 파일 구조 (업데이트 예정)
-```
-project-root/
-├── frontend/
-│   ├── pages/
-│   │   └── index.tsx         
-│   ├── components/
-│   │   ├── YouTubeInput.tsx  
-│   │   ├── VideoCropper.tsx 
-│   │   └── PdfDownloadButton.tsx
-│   └── utils/
-│       └── cropImage.ts
-├── backend/
-│   ├── main.py                    
-│   └── utils/
-│       ├── youtube_download.py  
-│       ├── frame_extractor.py  
-│       └── pdf_maker.py   
-└── README.md
-```
+  <img src="https://github.com/user-attachments/assets/2888dd22-2160-467f-9ab7-7f70f196cc50" width=400>
+
+- 결과물 (pdf)
+
+  <img src="https://github.com/user-attachments/assets/f7e219c9-ccbc-4822-8667-892288c10abc" width=300>
+
+<br>
 
 ### ⚙️ 설치 및 실행
 🔧 사전 준비
