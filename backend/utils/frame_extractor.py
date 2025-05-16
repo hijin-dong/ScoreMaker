@@ -12,7 +12,7 @@ def is_similar(img1, img2, threshold=30):
 
 def extract_and_crop_frames(
     video_path: str,
-    crop_box: Tuple[int, int, int, int],
+    crop_box: Tuple[int, int, int, int] = (0, 0, 1, 1),
     start_time_sec: int = 0,
     save_dir: str = None  # ✅ 새 인자 추가
 ) -> List[str]:
@@ -37,12 +37,22 @@ def extract_and_crop_frames(
 
         if count % frame_interval == 0:
             height, width, _ = frame.shape
-            x, y, w, h = map(int, crop_box)
 
-            x = max(0, x)
-            y = max(0, y)
-            w = min(w, width - x)
-            h = min(h, height - y)
+            frame_height, frame_width = frame.shape[:2]
+            rel_x, rel_y, rel_w, rel_h = crop_box  # 0~1 값
+
+            if not (0 <= rel_x <= 1 and 0 <= rel_y <= 1 and 0 <= rel_w <= 1 and 0 <= rel_h <= 1):
+                rel_x, rel_y, rel_w, rel_h = 0, 0, 1, 1
+
+            x = int(rel_x * frame_width)
+            y = int(rel_y * frame_height)
+            w = int(rel_w * frame_width)
+            h = int(rel_h * frame_height)
+
+            if w <= 0 or h <= 0 or x + w > frame_width or y + h > frame_height:
+                print(f"잘못된 크롭 영역: x={x}, y={y}, w={w}, h={h}, frame={frame_width}x{frame_height}")
+                count += 1
+                continue
 
             cropped = frame[y:y+h, x:x+w]
 

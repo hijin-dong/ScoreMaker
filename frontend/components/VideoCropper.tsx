@@ -20,36 +20,47 @@ const VideoCropper: React.FC<VideoCropperProps> = ({ image, onCropDone }) => {
   const imgRef = useRef<HTMLImageElement>(null);
 
   const handleCropComplete = async () => {
-    if (!completedCrop || !imgRef.current) return;
+    const img = imgRef.current;
+    if (!completedCrop || !img) return;
 
     const canvas = document.createElement('canvas');
-    canvas.width = completedCrop.width;
-    canvas.height = completedCrop.height;
+    const scaleX = img.naturalWidth / img.width;
+    const scaleY = img.naturalHeight / img.height;
+
+    canvas.width = completedCrop.width * scaleX;
+    canvas.height = completedCrop.height * scaleY;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     ctx.drawImage(
-      imgRef.current,
-      completedCrop.x,
-      completedCrop.y,
-      completedCrop.width,
-      completedCrop.height,
+      img,
+      completedCrop.x * scaleX,
+      completedCrop.y * scaleY,
+      completedCrop.width * scaleX,
+      completedCrop.height * scaleY,
       0,
       0,
-      completedCrop.width,
-      completedCrop.height
+      completedCrop.width * scaleX,
+      completedCrop.height * scaleY
     );
 
     canvas.toBlob((blob) => {
       if (!blob) return;
 
-      onCropDone(blob, {
-        x: completedCrop.x,
-        y: completedCrop.y,
-        w: completedCrop.width,
-        h: completedCrop.height,
-      });
+      const naturalWidth = img.naturalWidth;
+      const naturalHeight = img.naturalHeight;
+
+      const normalized = {
+        x: (completedCrop.x * scaleX) / naturalWidth,
+        y: (completedCrop.y * scaleY) / naturalHeight,
+        w: (completedCrop.width * scaleX) / naturalWidth,
+        h: (completedCrop.height * scaleY) / naturalHeight,
+      };
+
+      console.log('crop box (normalized):', normalized);
+
+      onCropDone(blob, normalized);
     }, 'image/jpeg');
   };
 
