@@ -58,8 +58,6 @@ const VideoCropper: React.FC<VideoCropperProps> = ({ image, onCropDone }) => {
         h: (completedCrop.height * scaleY) / naturalHeight,
       };
 
-      console.log('crop box (normalized):', normalized);
-
       onCropDone(blob, normalized);
     }, 'image/jpeg');
   };
