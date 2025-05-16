@@ -9,7 +9,5 @@ def process_youtube_video_to_pdf(
     output_pdf_path: str,
     start_time_sec: int = 0
 ):
-    with tempfile.TemporaryDirectory() as tmpdir:
-        video_path = download_youtube_video(youtube_url, tmpdir)
-        images = extract_and_crop_frames(video_path, crop_box, start_time_sec=start_time_sec)
-        create_pdf_from_images(images, output_pdf_path)
+    images = extract_and_crop_frames(youtube_url, crop_box, start_time_sec=start_time_sec)
+    create_pdf_from_images(images, output_pdf_path)
